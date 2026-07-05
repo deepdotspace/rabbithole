@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth, useUser, signOut } from 'deepspace'
 import { LogOut } from 'lucide-react'
-import { Button, Avatar, AvatarImage, AvatarFallback } from '@/components/ui'
+import { Button } from '@/components/ui'
+import { UserAvatar } from './UserAvatar'
 import { SignInOverlay } from './SignInOverlay'
 
 /** Sign-in trigger when signed out; avatar + sign-out when signed in. */
@@ -35,27 +36,24 @@ export function AccountMenu() {
   }
 
   const name = user?.name ?? 'You'
-  const initials = name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
 
   return (
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center rounded-full transition hover:opacity-90"
+        className="flex items-center rounded-full ring-1 ring-border/70 transition hover:ring-primary/40"
         aria-label="Account"
       >
-        <Avatar className="h-8 w-8 ring-1 ring-border ring-offset-2 ring-offset-background">
-          {user?.imageUrl && <AvatarImage src={user.imageUrl} alt={name} />}
-          <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary">
-            {initials}
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar name={name} imageUrl={user?.imageUrl} size={32} />
       </button>
       {open && (
-        <div className="absolute right-0 z-40 mt-2 w-52 overflow-hidden rounded-xl border border-border bg-popover p-1 shadow-[0_8px_28px_rgba(0,0,0,0.45)]">
-          <div className="px-3 py-2">
-            <p className="truncate text-sm font-medium text-foreground">{name}</p>
-            {user?.email && <p className="truncate text-xs text-muted-foreground">{user.email}</p>}
+        <div className="absolute right-0 z-40 mt-2 w-56 overflow-hidden rounded-xl border border-border bg-popover p-1 shadow-[0_8px_28px_rgba(0,0,0,0.45)]">
+          <div className="flex items-center gap-2.5 px-2.5 py-2">
+            <UserAvatar name={name} imageUrl={user?.imageUrl} size={36} />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium text-foreground">{name}</p>
+              {user?.email && <p className="truncate text-xs text-muted-foreground">{user.email}</p>}
+            </div>
           </div>
           <div className="my-1 h-px bg-border" />
           <button
