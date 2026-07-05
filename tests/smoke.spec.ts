@@ -12,7 +12,7 @@ test.describe('Home (public)', () => {
     const errors = captureConsoleErrors(page)
     await page.goto('/')
     await waitForApp(page)
-    await expect(page.getByRole('heading', { name: /go down the rabbit hole/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /rabbit hole/i })).toBeVisible()
     // Scaffold placeholders must be gone.
     await expect(page.locator('text=Your DeepSpace app is running')).toHaveCount(0)
     await expect(page.locator('text=Get started')).toHaveCount(0)
@@ -52,7 +52,7 @@ test.describe('Digging (signed in)', () => {
     await page.getByRole('button', { name: /start digging/i }).click()
 
     // Landed on the board; the root question renders.
-    await page.waitForURL(/\/hole\/.+/, { timeout: 15000 })
+    await page.waitForURL(/\/burrow\/.+/, { timeout: 15000 })
     await expect(page.getByText(question).first()).toBeVisible({ timeout: 15000 })
 
     // Pull a thread with the cheap Wikipedia lens.
@@ -72,8 +72,8 @@ test.describe('Digging (signed in)', () => {
     try {
       const card = page.locator('article', { hasText: question }).first()
       await card.hover()
-      await card.getByRole('button', { name: /delete hole/i }).click()
-      await page.getByRole('button', { name: /delete hole/i }).last().click()
+      await card.getByRole('button', { name: /delete burrow/i }).click()
+      await page.getByRole('button', { name: /delete burrow/i }).last().click()
       await expect(page.locator('article', { hasText: question })).toHaveCount(0, { timeout: 10000 })
     } catch {
       /* best-effort cleanup */

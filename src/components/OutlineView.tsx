@@ -12,7 +12,7 @@ interface OutlineProps {
   selectedId: string | null
   diggingId: string | null
   onSelect: (id: string) => void
-  onPull: (nodeId: string, lens: LensId) => void
+  onPull: (nodeId: string, lens: LensId, focus?: string) => void
   onToggleCollapse: (nodeId: string, next: boolean) => void
 }
 
@@ -89,7 +89,7 @@ function Row({ record, depth, ...p }: OutlineProps & { record: NodeRecord; depth
             model={model}
             canDig={canDig}
             digging={diggingId === record.recordId}
-            onPull={(lens) => onPull(record.recordId, lens)}
+            onPull={(lens, focus) => onPull(record.recordId, lens, focus)}
             onJump={onSelect}
           />
         </div>

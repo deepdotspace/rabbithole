@@ -13,7 +13,7 @@ interface ColumnsProps {
   selectedId: string | null
   diggingId: string | null
   onSelect: (id: string) => void
-  onPull: (nodeId: string, lens: LensId) => void
+  onPull: (nodeId: string, lens: LensId, focus?: string) => void
 }
 
 function ColumnItem({
@@ -131,7 +131,7 @@ export function ColumnsView({ model, canDig, selectedId, diggingId, onSelect, on
                 model={model}
                 canDig={canDig}
                 digging={diggingId === selected.recordId}
-                onPull={(lens) => onPull(selected.recordId, lens)}
+                onPull={(lens, focus) => onPull(selected.recordId, lens, focus)}
                 onJump={onSelect}
                 pullAlign="left"
               />

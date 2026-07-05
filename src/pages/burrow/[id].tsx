@@ -10,7 +10,7 @@ import { callAction } from '../../lib/actions'
 import { AccountMenu } from '../../components/AccountMenu'
 import { Breadcrumb } from '../../components/Breadcrumb'
 import { ViewToggle, type BoardView } from '../../components/ViewToggle'
-import { ToneDial } from '../../components/ToneDial'
+import { TellingControl } from '../../components/TellingControl'
 import { OutlineView } from '../../components/OutlineView'
 import { ColumnsView } from '../../components/ColumnsView'
 import { TrailPanel } from '../../components/TrailPanel'
@@ -71,7 +71,7 @@ export default function HolePage() {
     setVisited((prev) => [nodeId, ...prev.filter((x) => x !== nodeId)].slice(0, 40))
   }
 
-  async function onPull(nodeId: string, lens: LensId) {
+  async function onPull(nodeId: string, lens: LensId, focus?: string) {
     if (!canDig) return
     setDiggingId(nodeId)
     // Make sure the parent is expanded so new findings are visible.
@@ -82,6 +82,7 @@ export default function HolePage() {
       parentId: nodeId,
       lens,
       tone,
+      focus: focus ?? '',
     })
     setDiggingId(null)
     if (!res.success) {
@@ -113,7 +114,7 @@ export default function HolePage() {
       await copyLink()
       success('Link copied', 'Anyone with the link can now follow this trail.')
     } else {
-      success('Sharing turned off', 'This hole is private again.')
+      success('Sharing turned off', 'This burrow is private again.')
     }
   }
 
@@ -143,14 +144,14 @@ export default function HolePage() {
   if (!hole) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
-        <p className="font-serif text-2xl text-foreground">This hole isn't here</p>
+        <p className="font-serif text-2xl text-foreground">This burrow isn't here</p>
         <p className="max-w-sm text-sm text-muted-foreground">
           It may be private, or the link may be wrong.
           {!isSignedIn && ' If it belongs to you, sign in to open it.'}
         </p>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={() => navigate('/')}>
-            Back to your holes
+            Back to your burrows
           </Button>
           {!isSignedIn && <AccountMenu />}
         </div>
@@ -168,7 +169,7 @@ export default function HolePage() {
         <button
           onClick={() => navigate('/')}
           className="flex shrink-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          aria-label="Back to your holes"
+          aria-label="Back to your burrows"
         >
           <ArrowLeft className="h-4 w-4" />
           <BurrowMark />
@@ -179,9 +180,7 @@ export default function HolePage() {
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
-          <div className="hidden items-center rounded-lg border border-border bg-card px-2.5 py-1 md:flex">
-            <ToneDial value={tone} onChange={changeTone} />
-          </div>
+          {canDig && <TellingControl tone={tone} onChange={changeTone} />}
           <ViewToggle view={view} onChange={setView} />
           {canDig && (
             <Button
@@ -211,14 +210,9 @@ export default function HolePage() {
         </div>
       </header>
 
-      {/* Tone dial on small screens. */}
-      <div className="flex items-center justify-center border-b border-border/60 py-1.5 md:hidden">
-        <ToneDial value={tone} onChange={changeTone} />
-      </div>
-
       {!canDig && (
         <div className="border-b border-border/60 bg-card/40 px-4 py-1.5 text-center text-xs text-muted-foreground">
-          You're following someone else's trail — reading only. Start your own hole to dig.
+          You're following someone else's trail — reading only. Start your own burrow to dig.
         </div>
       )}
 

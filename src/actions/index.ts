@@ -105,6 +105,7 @@ export const actions: Record<string, ActionHandler<Env>> = {
     const parentId = String(params.parentId ?? '')
     const lens = String(params.lens ?? '') as LensId
     const tone = typeof params.tone === 'number' ? params.tone : 40
+    const focus = String(params.focus ?? '').trim().slice(0, 300)
     if (!holeId || !parentId) return { success: false, error: 'Missing hole or node.' }
     if (!PULLABLE_LENSES.includes(lens)) return { success: false, error: 'Unknown lens.' }
 
@@ -119,7 +120,7 @@ export const actions: Record<string, ActionHandler<Env>> = {
     if (!parentRes.success) return parentRes
     const parent = (parentRes.data as { record: Envelope<Node> }).record
 
-    const query = buildQuery(hole.data.rootQuestion, parent.data.title, parent.data.body, lens)
+    const query = buildQuery(hole.data.rootQuestion, parent.data.title, parent.data.body, lens, focus)
     const raw = await queryLens(tools, lens, query)
     const hits = normalizeHits(lens, raw)
     if (hits.length === 0) {
@@ -132,6 +133,7 @@ export const actions: Record<string, ActionHandler<Env>> = {
       parentTitle: parent.data.title,
       tone,
       hits,
+      focus,
     })
     const { label } = toneDescriptor(tone)
     let modelText = ''

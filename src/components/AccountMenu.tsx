@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { useAuth, useUser, signOut, AuthOverlay } from 'deepspace'
+import { useAuth, useUser, signOut } from 'deepspace'
 import { LogOut } from 'lucide-react'
 import { Button, Avatar, AvatarImage, AvatarFallback } from '@/components/ui'
+import { SignInOverlay } from './SignInOverlay'
 
 /** Sign-in trigger when signed out; avatar + sign-out when signed in. */
 export function AccountMenu() {
@@ -28,7 +29,7 @@ export function AccountMenu() {
         <Button size="sm" variant="outline" onClick={() => setShowAuth(true)}>
           Sign in
         </Button>
-        {showAuth && <AuthOverlay onClose={() => setShowAuth(false)} providers={['google', 'github']} />}
+        {showAuth && <SignInOverlay onClose={() => setShowAuth(false)} />}
       </>
     )
   }
@@ -40,11 +41,14 @@ export function AccountMenu() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center rounded-full ring-offset-2 ring-offset-background transition hover:ring-2 hover:ring-border"
+        className="flex items-center rounded-full transition hover:opacity-90"
+        aria-label="Account"
       >
-        <Avatar className="h-8 w-8">
+        <Avatar className="h-8 w-8 ring-1 ring-border ring-offset-2 ring-offset-background">
           {user?.imageUrl && <AvatarImage src={user.imageUrl} alt={name} />}
-          <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+          <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary">
+            {initials}
+          </AvatarFallback>
         </Avatar>
       </button>
       {open && (

@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { Link2, CornerDownRight } from 'lucide-react'
 import type { NodeRecord } from '../types'
 import type { TreeModel } from '../lib/tree'
-import type { LensId } from '../lenses'
+import { DEFAULT_LENS, type LensId } from '../lenses'
 import { LensChip, LensDot } from './LensChip'
 import { SourceList } from './SourceList'
 import { PullMenu } from './PullMenu'
@@ -89,12 +90,18 @@ export function NodeDetail({
   model: TreeModel
   canDig: boolean
   digging: boolean
-  onPull: (lens: LensId) => void
+  onPull: (lens: LensId, focus?: string) => void
   onJump: (id: string) => void
   pullAlign?: 'left' | 'right'
 }) {
   const isRoot = record.data.lens === 'root'
   const childCount = model.childrenOf(record.recordId).length
+  const [focus, setFocus] = useState('')
+
+  function pull(lens: LensId) {
+    onPull(lens, focus.trim())
+    setFocus('')
+  }
 
   return (
     <div>
@@ -114,16 +121,27 @@ export function NodeDetail({
       <Connections record={record} model={model} onJump={onJump} />
 
       {canDig && (
-        <div className="mt-3">
-          <PullMenu
-            onPull={onPull}
-            digging={digging}
-            align={pullAlign}
-            label={isRoot ? 'Pull first thread' : 'Dig deeper'}
-          />
+        <div className="mt-3 space-y-2">
+          <div className="flex items-stretch gap-1.5">
+            <input
+              value={focus}
+              onChange={(e) => setFocus(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !digging) pull(DEFAULT_LENS)
+              }}
+              placeholder={isRoot ? 'Dig into a specific angle (optional)' : 'Follow a specific angle (optional)'}
+              className="min-w-0 flex-1 rounded-lg border border-border bg-background/60 px-2.5 py-1.5 text-[13px] text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring"
+            />
+            <PullMenu
+              onPull={pull}
+              digging={digging}
+              align={pullAlign}
+              label={focus.trim() ? 'Dig in' : isRoot ? 'Pull first thread' : 'Dig deeper'}
+            />
+          </div>
           {childCount > 0 && (
-            <span className="ml-2 align-middle text-xs text-muted-foreground">
-              <LensChip lens={record.data.lens} size="xs" className="mr-1 align-middle" />
+            <span className="inline-flex items-center text-xs text-muted-foreground">
+              <LensChip lens={record.data.lens} size="xs" className="mr-1" />
               {childCount} thread{childCount === 1 ? '' : 's'} pulled
             </span>
           )}

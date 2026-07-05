@@ -296,3 +296,17 @@
   50% { opacity: 1; transform: translateY(-2px); }
 }
 .rh-dig-dot { animation: rh-dig 1s ease-in-out infinite; }
+
+/* Home vortex — a slow hypnotic rabbit-hole tunnel behind the hero. */
+@keyframes rh-spin { to { transform: rotate(360deg); } }
+@keyframes rh-spin-rev { to { transform: rotate(-360deg); } }
+@keyframes rh-pulse-glow { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.85; } }
+.rh-vortex-spin { transform-origin: center; animation: rh-spin 90s linear infinite; }
+.rh-vortex-rev { transform-origin: center; animation: rh-spin-rev 60s linear infinite; }
+.rh-vortex-core { animation: rh-pulse-glow 6s ease-in-out infinite; }
+.rh-float { animation: rh-floaty 7s ease-in-out infinite; }
+@keyframes rh-floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .rh-vortex-spin, .rh-vortex-rev, .rh-vortex-core, .rh-float, .rh-dig-dot { animation: none; }
+}

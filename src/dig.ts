@@ -51,23 +51,37 @@ function keywordize(s: string, maxWords = 8): string {
   return kept.length ? kept.join(' ') : clean(s).slice(0, 120)
 }
 
-/** Build the search query for a lens from the parent finding's context. */
-export function buildQuery(rootQuestion: string, parentTitle: string, parentBody: string, lens: LensId): string {
-  const focus = clean(parentTitle) || clean(rootQuestion)
+/**
+ * Build the search query for a lens. When `userFocus` is set (the "dig into
+ * something specific" input) it becomes the primary seed, anchored to the
+ * investigation for context; otherwise the parent finding's title is the seed.
+ */
+export function buildQuery(
+  rootQuestion: string,
+  parentTitle: string,
+  parentBody: string,
+  lens: LensId,
+  userFocus = '',
+): string {
+  const focus = clean(userFocus)
+  const seed = focus || clean(parentTitle) || clean(rootQuestion)
   const context = clean(parentBody).slice(0, 240)
   if (lens === 'wikipedia') {
     // Wikipedia search is title/keyword-oriented — drop question scaffolding.
-    return keywordize(focus, 6)
+    return keywordize(seed, 6)
   }
   if (lens === 'newsapi') {
     // NewsAPI does boolean keyword matching; a terse keyword phrase beats a sentence.
-    return keywordize(focus, 8)
+    return keywordize(seed, 8)
   }
   // Exa / websearch take a natural-language prompt with context.
   const anchor = clean(rootQuestion)
-  return context && focus !== anchor
-    ? `${focus} — in the context of: ${anchor}`
-    : focus || anchor
+  if (focus) {
+    const parent = clean(parentTitle)
+    const around = parent && parent !== anchor ? `${parent} (${anchor})` : anchor
+    return `${focus} — in the context of: ${around}`
+  }
+  return context && seed !== anchor ? `${seed} — in the context of: ${anchor}` : seed || anchor
 }
 
 /** Normalize a lens's raw `integration.data` payload into RawHits. */
@@ -176,8 +190,10 @@ export function buildSynthPrompt(args: {
   parentTitle: string
   tone: number
   hits: RawHit[]
+  focus?: string
 }): { system: string; user: string } {
   const { rootQuestion, parentTitle, tone, hits } = args
+  const focus = clean(args.focus)
   const { instruction } = toneDescriptor(tone)
   const system =
     'You turn raw search results into short, navigable research findings for an investigation board. ' +
@@ -192,8 +208,9 @@ export function buildSynthPrompt(args: {
 
   const user =
     `Investigation question: ${rootQuestion}\n` +
-    `Pulling a thread from: ${parentTitle || rootQuestion}\n\n` +
-    `Sources:\n${sourceBlock}\n\n` +
+    `Pulling a thread from: ${parentTitle || rootQuestion}\n` +
+    (focus ? `The reader specifically asked to dig into: ${focus}\n` : '') +
+    `\nSources:\n${sourceBlock}\n\n` +
     `Write ${hits.length} finding object(s) as a JSON array.`
 
   return { system, user }
