@@ -77,7 +77,12 @@ export default function HolePage() {
     // Make sure the parent is expanded so new findings are visible.
     const parent = model.byId.get(nodeId)
     if (parent?.data.collapsed) nodePut.put(nodeId, { collapsed: false }).catch(() => {})
-    const res = await callAction<{ created?: unknown[]; note?: string }>('pullThread', {
+    const res = await callAction<{
+      created?: unknown[]
+      note?: string
+      lens?: LensId
+      fellBack?: boolean
+    }>('pullThread', {
       holeId: id,
       parentId: nodeId,
       lens,
@@ -90,11 +95,19 @@ export default function HolePage() {
       return
     }
     const created = res.data?.created ?? []
+    const usedLens = res.data?.lens ?? lens
     if (created.length === 0) {
       info('Nothing new down there', `${lensOf(lens).label} turned up no fresh findings. Try another lens.`)
+    } else if (res.data?.fellBack) {
+      select(nodeId)
+      const count = created.length
+      info(
+        `Pulled ${count} finding${count === 1 ? '' : 's'}`,
+        `${lensOf(lens).label} came up empty, so we dug with ${lensOf(usedLens).label} instead.`,
+      )
     } else {
       select(nodeId)
-      success(`Pulled ${created.length} finding${created.length === 1 ? '' : 's'}`, `via ${lensOf(lens).label}`)
+      success(`Pulled ${created.length} finding${created.length === 1 ? '' : 's'}`, `via ${lensOf(usedLens).label}`)
     }
   }
 

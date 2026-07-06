@@ -122,9 +122,24 @@ export const actions: Record<string, ActionHandler<Env>> = {
     if (!parentRes.success) return parentRes
     const parent = (parentRes.data as { record: Envelope<Node> }).record
 
+    let effectiveLens = lens
     const query = buildQuery(hole.data.rootQuestion, parent.data.title, parent.data.body, lens, focus)
     const raw = await queryLens(tools, lens, query)
-    const hits = normalizeHits(lens, raw)
+    let hits = normalizeHits(lens, raw)
+
+    // The keyword lenses (Wikipedia / News) can come up empty on a conversational
+    // query. Rather than a dead end, fall back to Exa's natural-language trail.
+    let fellBack = false
+    if (hits.length === 0 && lens !== 'exa') {
+      const exaQuery = buildQuery(hole.data.rootQuestion, parent.data.title, parent.data.body, 'exa', focus)
+      const exaHits = normalizeHits('exa', await queryLens(tools, 'exa', exaQuery))
+      if (exaHits.length > 0) {
+        hits = exaHits
+        effectiveLens = 'exa'
+        fellBack = true
+      }
+    }
+
     if (hits.length === 0) {
       return { success: true, data: { created: [], note: 'no-findings' } }
     }
@@ -180,7 +195,7 @@ export const actions: Record<string, ActionHandler<Env>> = {
       const node: Node = {
         holeId,
         parentId,
-        lens,
+        lens: effectiveLens,
         title: f.title,
         body: f.narration,
         sources: f.sources,
@@ -199,7 +214,7 @@ export const actions: Record<string, ActionHandler<Env>> = {
       }
     }
 
-    return { success: true, data: { created, lens } }
+    return { success: true, data: { created, lens: effectiveLens, requestedLens: lens, fellBack } }
   },
 
   /** Flip a hole between private and shared-by-link; cascade to every node. */
