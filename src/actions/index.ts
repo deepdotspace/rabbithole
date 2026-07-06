@@ -90,6 +90,7 @@ export const actions: Record<string, ActionHandler<Env>> = {
       sources: [],
       refs: [],
       focus: '',
+      pullId: '',
       collapsed: false,
       visibility: 'private',
       ownerId: userId,
@@ -165,6 +166,8 @@ export const actions: Record<string, ActionHandler<Env>> = {
       }
     }
 
+    // One id per pull so each batch of findings renders as its own thread.
+    const pullId = crypto.randomUUID()
     const created: { recordId: string; title: string; refs: string[] }[] = []
     for (const f of findings) {
       const refs = Array.from(
@@ -183,6 +186,7 @@ export const actions: Record<string, ActionHandler<Env>> = {
         sources: f.sources,
         refs,
         focus,
+        pullId,
         collapsed: false,
         visibility: hole.data.visibility,
         ownerId: userId,

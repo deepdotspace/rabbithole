@@ -18,6 +18,34 @@ export interface TreeModel {
   nodeCount: number
 }
 
+export interface PullGroup {
+  key: string
+  /** The raw pullId ('' for legacy nodes created before pull grouping). */
+  pid: string
+  /** The dig focus shared by this pull's findings, if any. */
+  focus: string
+  items: NodeRecord[]
+}
+
+/**
+ * Split a node's children into the pulls that produced them, in order. Findings
+ * are createdAt-sorted, so one pull's findings are contiguous; a new pullId
+ * starts a new group. Each pull renders as its own thread in both views.
+ */
+export function groupChildrenByPull(children: NodeRecord[]): PullGroup[] {
+  const groups: PullGroup[] = []
+  for (const c of children) {
+    const pid = c.data.pullId || ''
+    const last = groups[groups.length - 1]
+    if (last && last.pid === pid) {
+      last.items.push(c)
+    } else {
+      groups.push({ key: pid || `legacy-${groups.length}`, pid, focus: c.data.focus || '', items: [c] })
+    }
+  }
+  return groups
+}
+
 export function buildTree(records: NodeRecord[]): TreeModel {
   const byId = new Map<string, NodeRecord>()
   const children = new Map<string, NodeRecord[]>()

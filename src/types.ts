@@ -44,6 +44,8 @@ export interface Node {
   refs: string[]
   /** The "dig into a specific angle" text the reader typed for this pull, if any. */
   focus: string
+  /** Groups the findings created by one pull, so each pull renders as its own thread. */
+  pullId: string
   collapsed: boolean
   visibility: Visibility
   ownerId: string

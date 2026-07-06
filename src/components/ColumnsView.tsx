@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { ChevronRight } from 'lucide-react'
 import type { NodeRecord } from '../types'
-import type { TreeModel } from '../lib/tree'
+import { groupChildrenByPull, type TreeModel } from '../lib/tree'
 import type { LensId } from '../lenses'
 import { LensChip, LensDot } from './LensChip'
 import { NodeDetail } from './NodeDetail'
@@ -96,26 +96,25 @@ export function ColumnsView({ model, canDig, selectedId, diggingId, onSelect, on
                 <span className="truncate text-xs text-muted-foreground">{parent?.data.title}</span>
               </div>
               <div className="rh-scroll flex-1 space-y-0.5 overflow-y-auto p-1.5">
-                {col.children.map((c, i) => {
-                  const prevFocus = i > 0 ? col.children[i - 1].data.focus : undefined
-                  const showFocus = Boolean(c.data.focus) && c.data.focus !== prevFocus
-                  return (
-                    <div key={c.recordId}>
-                      {showFocus && (
-                        <div className="px-1 pb-0.5 pt-1.5">
-                          <FocusTag focus={c.data.focus} />
-                        </div>
-                      )}
+                {groupChildrenByPull(col.children).map((group, gi) => (
+                  <div key={group.key} className={gi > 0 ? 'mt-1 border-t border-border/40 pt-1' : undefined}>
+                    {group.focus && (
+                      <div className="px-1 pb-0.5 pt-0.5">
+                        <FocusTag focus={group.focus} />
+                      </div>
+                    )}
+                    {group.items.map((c) => (
                       <ColumnItem
+                        key={c.recordId}
                         record={c}
                         model={model}
                         active={col.activeChildId === c.recordId || selectedId === c.recordId}
                         onSelect={onSelect}
                         digging={diggingId === c.recordId}
                       />
-                    </div>
-                  )
-                })}
+                    ))}
+                  </div>
+                ))}
               </div>
             </div>
           )

@@ -23,6 +23,7 @@ export const nodesSchema: CollectionSchema = {
     { name: 'sources', storage: 'text', interpretation: { kind: 'json' } },
     { name: 'refs', storage: 'text', interpretation: { kind: 'json' } },
     { name: 'focus', storage: 'text', interpretation: 'plain' },
+    { name: 'pullId', storage: 'text', interpretation: 'plain' },
     { name: 'collapsed', storage: 'text', interpretation: { kind: 'json' } },
     {
       name: 'visibility',

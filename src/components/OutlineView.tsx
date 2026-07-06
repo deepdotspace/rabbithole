@@ -1,6 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import type { NodeRecord } from '../types'
-import type { TreeModel } from '../lib/tree'
+import { groupChildrenByPull, type TreeModel } from '../lib/tree'
 import type { LensId } from '../lenses'
 import { LensChip } from './LensChip'
 import { NodeDetail } from './NodeDetail'
@@ -98,20 +98,18 @@ function Row({ record, depth, ...p }: OutlineProps & { record: NodeRecord; depth
 
       {hasChildren && !collapsed && (
         <div className="ml-3 border-l border-border/70 pl-2">
-          {children.map((c, i) => {
-            const prevFocus = i > 0 ? children[i - 1].data.focus : undefined
-            const showFocus = Boolean(c.data.focus) && c.data.focus !== prevFocus
-            return (
-              <div key={c.recordId}>
-                {showFocus && (
-                  <div className="mb-0.5 mt-1.5 pl-1.5">
-                    <FocusTag focus={c.data.focus} />
-                  </div>
-                )}
-                <Row record={c} depth={depth + 1} {...p} />
-              </div>
-            )
-          })}
+          {groupChildrenByPull(children).map((group, gi) => (
+            <div key={group.key} className={gi > 0 ? 'mt-1.5 border-t border-border/40 pt-1.5' : undefined}>
+              {group.focus && (
+                <div className="mb-0.5 pl-1.5">
+                  <FocusTag focus={group.focus} />
+                </div>
+              )}
+              {group.items.map((c) => (
+                <Row key={c.recordId} record={c} depth={depth + 1} {...p} />
+              ))}
+            </div>
+          ))}
         </div>
       )}
     </div>
