@@ -21,13 +21,13 @@ test('a shared hole becomes readable to another user; private stays hidden', asy
   await waitForHome(owner.page)
   await owner.page.getByPlaceholder('What are you curious about?').fill(question)
   await owner.page.getByRole('button', { name: /start digging/i }).click()
-  await owner.page.waitForURL(/\/burrow\/.+/, { timeout: 15000 })
+  await owner.page.waitForURL(/\/dig\/.+/, { timeout: 15000 })
   const holeUrl = owner.page.url()
   await expect(owner.page.getByText(question).first()).toBeVisible({ timeout: 15000 })
 
   // While private, the other user cannot open it.
   await other.page.goto(holeUrl)
-  await expect(other.page.getByText("This burrow isn't here")).toBeVisible({ timeout: 15000 })
+  await expect(other.page.getByText("This dig isn't here")).toBeVisible({ timeout: 15000 })
   await expect(other.page.getByText(question)).toHaveCount(0)
 
   // Owner shares it.
@@ -46,8 +46,8 @@ test('a shared hole becomes readable to another user; private stays hidden', asy
   try {
     const card = owner.page.locator('article', { hasText: question }).first()
     await card.hover()
-    await card.getByRole('button', { name: /delete burrow/i }).click()
-    await owner.page.getByRole('button', { name: /delete burrow/i }).last().click()
+    await card.getByRole('button', { name: /delete dig/i }).click()
+    await owner.page.getByRole('button', { name: /delete dig/i }).last().click()
     await expect(owner.page.locator('article', { hasText: question })).toHaveCount(0, { timeout: 10000 })
   } catch {
     /* best-effort */

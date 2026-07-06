@@ -5,6 +5,7 @@ import type { TreeModel } from '../lib/tree'
 import type { LensId } from '../lenses'
 import { LensChip, LensDot } from './LensChip'
 import { NodeDetail } from './NodeDetail'
+import { FocusTag } from './FocusTag'
 import { cn } from '@/lib/utils'
 
 interface ColumnsProps {
@@ -95,16 +96,26 @@ export function ColumnsView({ model, canDig, selectedId, diggingId, onSelect, on
                 <span className="truncate text-xs text-muted-foreground">{parent?.data.title}</span>
               </div>
               <div className="rh-scroll flex-1 space-y-0.5 overflow-y-auto p-1.5">
-                {col.children.map((c) => (
-                  <ColumnItem
-                    key={c.recordId}
-                    record={c}
-                    model={model}
-                    active={col.activeChildId === c.recordId || selectedId === c.recordId}
-                    onSelect={onSelect}
-                    digging={diggingId === c.recordId}
-                  />
-                ))}
+                {col.children.map((c, i) => {
+                  const prevFocus = i > 0 ? col.children[i - 1].data.focus : undefined
+                  const showFocus = Boolean(c.data.focus) && c.data.focus !== prevFocus
+                  return (
+                    <div key={c.recordId}>
+                      {showFocus && (
+                        <div className="px-1 pb-0.5 pt-1.5">
+                          <FocusTag focus={c.data.focus} />
+                        </div>
+                      )}
+                      <ColumnItem
+                        record={c}
+                        model={model}
+                        active={col.activeChildId === c.recordId || selectedId === c.recordId}
+                        onSelect={onSelect}
+                        digging={diggingId === c.recordId}
+                      />
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )

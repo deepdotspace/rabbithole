@@ -31,7 +31,7 @@ export default function Home() {
   const [deleting, setDeleting] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const burrows = (records as HoleRecord[]).filter((h) => h.data.ownerId === userId)
+  const digs = (records as HoleRecord[]).filter((h) => h.data.ownerId === userId)
 
   async function startDigging() {
     const q = question.trim()
@@ -44,7 +44,7 @@ export default function Home() {
     const res = await callAction<{ holeId: string }>('createHole', { question: q, tone: 50 })
     setCreating(false)
     if (res.success && res.data) {
-      navigate(`/burrow/${res.data.holeId}`)
+      navigate(`/dig/${res.data.holeId}`)
     } else {
       error('Could not start', res.error ?? 'Please try again.')
     }
@@ -61,7 +61,7 @@ export default function Home() {
     const res = await callAction('deleteHole', { holeId: pendingDelete.recordId })
     setDeleting(false)
     setPendingDelete(null)
-    if (res.success) success('Filled back in', 'The burrow was deleted.')
+    if (res.success) success('Dig deleted', 'That trail and every finding on it are gone.')
     else error('Could not delete', res.error ?? 'Please try again.')
   }
 
@@ -71,7 +71,7 @@ export default function Home() {
       <header className="sticky top-0 z-20 border-b border-border/50 bg-background/80">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-3">
           <button onClick={() => navigate('/')} className="flex items-center gap-2">
-            <BurrowMark className="h-7 w-7" spin />
+            <SpiralMark className="h-7 w-7" spin />
             <span className="font-serif text-lg tracking-tight text-foreground">RabbitHole</span>
           </button>
           <AccountMenu />
@@ -145,19 +145,19 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Your burrows */}
+        {/* Your digs */}
         <section className="relative z-10 mt-20">
-          {isSignedIn && burrows.length > 0 && (
+          {isSignedIn && digs.length > 0 && (
             <>
               <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-muted-foreground">
-                Your burrows
+                Your digs
               </h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {burrows.map((h) => (
+                {digs.map((h) => (
                   <article
                     key={h.recordId}
                     className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-border bg-card p-4 transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_28px_rgba(0,0,0,0.4)]"
-                    onClick={() => navigate(`/burrow/${h.recordId}`)}
+                    onClick={() => navigate(`/dig/${h.recordId}`)}
                   >
                     <div
                       aria-hidden
@@ -174,7 +174,7 @@ export default function Home() {
                           setPendingDelete(h)
                         }}
                         className="shrink-0 rounded-md p-1 text-muted-foreground opacity-0 transition hover:bg-secondary hover:text-destructive group-hover:opacity-100"
-                        aria-label="Delete burrow"
+                        aria-label="Delete dig"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -200,9 +200,9 @@ export default function Home() {
             </>
           )}
 
-          {isSignedIn && burrows.length === 0 && (
+          {isSignedIn && digs.length === 0 && (
             <div className="mx-auto max-w-md rounded-xl border border-dashed border-border bg-card/40 px-6 py-10 text-center">
-              <p className="text-sm font-medium text-foreground">No burrows yet</p>
+              <p className="text-sm font-medium text-foreground">No digs yet</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 Ask a question above, or try one of these:
               </p>
@@ -223,7 +223,7 @@ export default function Home() {
           {!isSignedIn && (
             <div className="mx-auto grid max-w-3xl gap-3 sm:grid-cols-3">
               {[
-                { t: 'Ask anything', d: 'A question seeds the root of your burrow.' },
+                { t: 'Ask anything', d: 'A question seeds the root of your dig.' },
                 { t: 'Pull a thread', d: 'Each pull fetches real, cited findings and nests them underneath.' },
                 { t: 'Trace it back', d: 'Breadcrumbs and the trail keep the whole spiral navigable.' },
               ].map((s, i) => (
@@ -243,9 +243,9 @@ export default function Home() {
         open={Boolean(pendingDelete)}
         onClose={() => setPendingDelete(null)}
         onConfirm={confirmDelete}
-        title={pendingDelete ? `Delete '${pendingDelete.data.title}'?` : 'Delete burrow?'}
-        description="This fills the burrow back in — every finding on the trail is removed. This cannot be undone."
-        confirmText="Delete burrow"
+        title={pendingDelete ? `Delete '${pendingDelete.data.title}'?` : 'Delete dig?'}
+        description="This removes the whole dig — every finding on the trail is gone. This cannot be undone."
+        confirmText="Delete dig"
         variant="destructive"
         loading={deleting}
       />
@@ -254,7 +254,7 @@ export default function Home() {
 }
 
 /** The spiral rabbit-hole mark, optionally slowly spinning. */
-function BurrowMark({ className, spin }: { className?: string; spin?: boolean }) {
+function SpiralMark({ className, spin }: { className?: string; spin?: boolean }) {
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden>
       <g className={spin ? 'rh-vortex-spin' : undefined} style={{ transformOrigin: '16px 16px' }}>

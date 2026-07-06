@@ -114,7 +114,7 @@ export default function HolePage() {
       await copyLink()
       success('Link copied', 'Anyone with the link can now follow this trail.')
     } else {
-      success('Sharing turned off', 'This burrow is private again.')
+      success('Sharing turned off', 'This dig is private again.')
     }
   }
 
@@ -144,14 +144,14 @@ export default function HolePage() {
   if (!hole) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
-        <p className="font-serif text-2xl text-foreground">This burrow isn't here</p>
+        <p className="font-serif text-2xl text-foreground">This dig isn't here</p>
         <p className="max-w-sm text-sm text-muted-foreground">
           It may be private, or the link may be wrong.
           {!isSignedIn && ' If it belongs to you, sign in to open it.'}
         </p>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={() => navigate('/')}>
-            Back to your burrows
+            Back to your digs
           </Button>
           {!isSignedIn && <AccountMenu />}
         </div>
@@ -169,10 +169,10 @@ export default function HolePage() {
         <button
           onClick={() => navigate('/')}
           className="flex shrink-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          aria-label="Back to your burrows"
+          aria-label="Back to your digs"
         >
           <ArrowLeft className="h-4 w-4" />
-          <BurrowMark />
+          <SpiralMark />
         </button>
 
         <div className="min-w-0 flex-1">
@@ -212,7 +212,7 @@ export default function HolePage() {
 
       {!canDig && (
         <div className="border-b border-border/60 bg-card/40 px-4 py-1.5 text-center text-xs text-muted-foreground">
-          You're following someone else's trail — reading only. Start your own burrow to dig.
+          You're following someone else's trail — reading only. Start your own dig to pull threads.
         </div>
       )}
 
@@ -256,7 +256,7 @@ export default function HolePage() {
   )
 }
 
-function BurrowMark() {
+function SpiralMark() {
   return (
     <svg viewBox="0 0 32 32" className="h-6 w-6" aria-hidden>
       <path

@@ -42,6 +42,8 @@ export interface Node {
   sources: Source[]
   /** Ids of existing nodes this finding connects back to (shared sources). */
   refs: string[]
+  /** The "dig into a specific angle" text the reader typed for this pull, if any. */
+  focus: string
   collapsed: boolean
   visibility: Visibility
   ownerId: string

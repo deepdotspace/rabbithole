@@ -6,6 +6,7 @@ import { DEFAULT_LENS, type LensId } from '../lenses'
 import { LensChip, LensDot } from './LensChip'
 import { SourceList } from './SourceList'
 import { PullMenu } from './PullMenu'
+import { FocusTag } from './FocusTag'
 
 function short(s: string, n = 44): string {
   const t = (s ?? '').trim().replace(/\s+/g, ' ')
@@ -105,6 +106,11 @@ export function NodeDetail({
 
   return (
     <div>
+      {record.data.focus && !isRoot && (
+        <div className="mb-2">
+          <FocusTag focus={record.data.focus} />
+        </div>
+      )}
       {record.data.body && (
         <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-foreground/90">
           {record.data.body}

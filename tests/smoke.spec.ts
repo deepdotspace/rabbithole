@@ -52,7 +52,7 @@ test.describe('Digging (signed in)', () => {
     await page.getByRole('button', { name: /start digging/i }).click()
 
     // Landed on the board; the root question renders.
-    await page.waitForURL(/\/burrow\/.+/, { timeout: 15000 })
+    await page.waitForURL(/\/dig\/.+/, { timeout: 15000 })
     await expect(page.getByText(question).first()).toBeVisible({ timeout: 15000 })
 
     // Pull a thread with the cheap Wikipedia lens.
@@ -72,8 +72,8 @@ test.describe('Digging (signed in)', () => {
     try {
       const card = page.locator('article', { hasText: question }).first()
       await card.hover()
-      await card.getByRole('button', { name: /delete burrow/i }).click()
-      await page.getByRole('button', { name: /delete burrow/i }).last().click()
+      await card.getByRole('button', { name: /delete dig/i }).click()
+      await page.getByRole('button', { name: /delete dig/i }).last().click()
       await expect(page.locator('article', { hasText: question })).toHaveCount(0, { timeout: 10000 })
     } catch {
       /* best-effort cleanup */
